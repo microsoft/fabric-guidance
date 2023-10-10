@@ -1,7 +1,7 @@
 ## Connectivity
 
 * All enterprise customers and ISV's must use Tabular Data Stream(TDS) sql endpoint to connect to a Synapse Data Warehouse in Microsoft Fabric.
-* Microsoft Fabric uses proxy connections to establish connectivity. Here is a ![sample connectivity](/workloads/t-sql%20endpoint/T-SQL%20Connectivity.png)
+* Microsoft Fabric uses proxy connections to establish connectivity. Here is a connectivity view of Fabric DW. ![sample connectivity](/workloads/t-sql%20endpoint/T-SQL%20Connectivity.png)
 * It is recommended that customers/ISV's to embed retry logic mechanims for long running connections.
 * Except for Power BI direct lake mode connectivity, every other service will use t-sql endpoint to connect to Fabric Data Warehouse.
 
