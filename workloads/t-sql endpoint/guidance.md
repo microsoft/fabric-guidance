@@ -1,7 +1,7 @@
 ## Connectivity
 
 * T-SQL endpoint uses Tabular Data Stream(TDS) protocol to connect to a Synapse Data Warehouse in Microsoft Fabric.
-* Microsoft Fabric uses proxy connections to establish connectivity. Here is a connectivity view of Fabric DW. ![sample connectivity](/workloads/t-sql%20endpoint/T-SQL%20Connectivity.png)
+* Microsoft Fabric uses proxy connections to establish connectivity. Here is a connectivity view of Fabric DW. ![sample connectivity](T-SQL%20Connectivity.png)
 * Proxy connections can lead to connection timeout or transient connection failures. When executing long running queries, it is recommended to embed retry logic to ETL/ELT orchestration layer.
 * Microsoft Fabric supports [various drivers](https://learn.microsoft.com/en-us/sql/connect/sql-connection-libraries?view=sql-server-ver16#drivers-for-relational-access) for relational access. Some of the common drivers used to connect to Microsoft Fabric DW are 
     - Microsoft ODBC Driver for SQL Server
@@ -19,7 +19,7 @@ Microsoft Fabric supports only Azure Active Directory (Azure Entra) authenticati
 * For ETL/ELT, automation & ALM, Microsoft recommend customers to user service principal based authentication. 
 ```Note: Allow Service Principals to use Power BI APIs must be turned on in the admin portal to add a service principal explicitly to a workspace to access Fabric DW```
 </br>
-![Tenant Level Setting](/workloads/t-sql%20endpoint/SPN%20Tenant%20Level%20Setting.png)
+![Tenant Level Setting](SPN%20Tenant%20Level%20Setting.png)
 
 ```If your workloads are to be shared between tenants, then the service principal created in a tenant should be registered in other tenant(s) and should have admin consent to access resources in new tenants. Please note that the admin consent is mandatory to use the same service principal in multiple tentants. For example: If a ISV host data in ISV tenant and needs access to data in customer tenant, then the service principal that is created in ISV tenant must be registered in customer tenant using admin consent and then provide permissions on the data sources```
 
