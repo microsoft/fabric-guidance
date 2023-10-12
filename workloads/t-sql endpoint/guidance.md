@@ -19,7 +19,7 @@ Microsoft Fabric supports only Azure Active Directory (Azure Entra) authenticati
 * For ETL/ELT, automation & ALM, Microsoft recommend customers to user service principal based authentication. 
 ```Note: Allow Service Principals to use Power BI APIs must be turned on in the admin portal to add a service principal explicitly to a workspace to access Fabric DW```
 </br>
-![Tenant Level Setting](sp-tenant-setting.png)
+![Tenant Level Setting](/workloads/t-sql%20endpoint/sp-tenant-setting.png)
 
 ```If your workloads are to be shared between tenants, then the service principal created in a tenant should be registered in other tenant(s) and should have admin consent to access resources in new tenants. Please note that the admin consent is mandatory to use the same service principal in multiple tentants. For example: If a ISV host data in ISV tenant and needs access to data in customer tenant, then the service principal that is created in ISV tenant must be registered in customer tenant using admin consent and then provide permissions on the data sources```
 
