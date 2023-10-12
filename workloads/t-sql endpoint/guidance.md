@@ -21,7 +21,7 @@ Microsoft Fabric supports only Azure Active Directory (Azure Entra) authenticati
 </br>
 ![Tenant Level Setting](/workloads/t-sql%20endpoint/SPN%20Tenant%20Level%20Setting.png)
 
-    **```If your workloads are to be shared between tenants, then the service principal created in a tenant should be registered in other tenant(s) and should have admin consent to access resources in new tenants. Please note that the admin consent is mandatory to use the same service principal in multiple tentants. For example: If a ISV host data in ISV tenant and needs access to data in customer tenant, then the service principal that is created in ISV tenant must be registered in customer tenant using admin consent and then provide permissions on the data sources```**
+    ```If your workloads are to be shared between tenants, then the service principal created in a tenant should be registered in other tenant(s) and should have admin consent to access resources in new tenants. Please note that the admin consent is mandatory to use the same service principal in multiple tentants. For example: If a ISV host data in ISV tenant and needs access to data in customer tenant, then the service principal that is created in ISV tenant must be registered in customer tenant using admin consent and then provide permissions on the data sources```
 * SQL Authentication is not supported by Microsoft Fabric.
 * Workspace Managed Identity (equivalent to Managed Service Identity) will be available post GA. </br>
 ```Note: For automation purposes, Microsoft recommends customers\ISV's to use Service Principal based authentication.```
