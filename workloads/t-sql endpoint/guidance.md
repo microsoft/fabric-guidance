@@ -1,9 +1,11 @@
+T-SQL endpoint is an endpoint that applications use to connect both Synapse Data Warehouse & Lakehouse in Microsoft Fabric. Using t-sql endpoint, applications can ingest & read data from warehouse artifact and users can only read data from lakehouse artifact.
+
 ## Connectivity
 
 * T-SQL endpoint uses Tabular Data Stream(TDS) protocol to connect to a Synapse Data Warehouse in Microsoft Fabric.
-* Microsoft Fabric uses proxy connections to establish connectivity. Here is a connectivity view of Fabric DW. ![sample connectivity](tsql-connectivity.png)
+* t-sql endpoint uses proxy connection to establish connectivity. Here is a connectivity view of Fabric DW. ![sample connectivity](tsql-connectivity.png)
 * Proxy connections can lead to connection timeout or transient connection failures. When executing long running queries, it is recommended to embed retry logic to ETL/ELT orchestration layer.
-* Microsoft Fabric supports [various drivers](https://learn.microsoft.com/en-us/sql/connect/sql-connection-libraries?view=sql-server-ver16#drivers-for-relational-access) for relational access. Some of the common drivers used to connect to Microsoft Fabric DW are 
+* Microsoft Fabric supports [various drivers](https://learn.microsoft.com/en-us/sql/connect/sql-connection-libraries?view=sql-server-ver16#drivers-for-relational-access) for relational access by different clients. Some of common drivers used to connect t-sql endpoint are 
     - Microsoft ODBC Driver for SQL Server
     - ADO.NET
     - Microsoft OLEDB Driver for SQL Server
@@ -11,9 +13,9 @@
 
 * ```Note: Direct Lake mode connectivity to Synapse Data Warehouse in Microsoft Fabric will be available post GA```
 
-## Supported Authentication Modes by Fabric DW
+## Supported Authentication Modes by t-sql endpoint
 
-Microsoft Fabric supports only Azure Active Directory (Azure Entra) authentication.
+Microsoft Fabric supports only Azure Active Directory (Azure Entra ID) authentication.
 
 * For interactive workloads, Microsoft recommend customers to use pass through authentication.
 * For ETL/ELT, automation & ALM, Microsoft recommend customers to user service principal based authentication. 
@@ -23,7 +25,7 @@ Microsoft Fabric supports only Azure Active Directory (Azure Entra) authenticati
 
 ```If your workloads are to be shared between tenants, then the service principal created in a tenant should be registered in other tenant(s) and should have admin consent to access resources in new tenants. Please note that the admin consent is mandatory to use the same service principal in multiple tentants. For example: If a ISV host data in ISV tenant and needs access to data in customer tenant, then the service principal that is created in ISV tenant must be registered in customer tenant using admin consent and then provide permissions on the data sources```
 
-* SQL Authentication is not supported by Microsoft Fabric.
+* SQL Authentication is not supported by t-sql endpoint.
 * Workspace Managed Identity (equivalent to Managed Service Identity) will be available post GA. </br>
 ```Note: For automation purposes, Microsoft recommends customers\ISV's to use Service Principal based authentication.```
 
@@ -61,6 +63,22 @@ t-sql endpoint supports two data access patterns
     - A single FE can cause slowness in returning large amounts of data due to network, cross region or client irrespective of capacity & compute size.
     - Cross database queries will use the capacity of the t-sql endpoint that runs the sql queries.
     - Maximum number of concurrent connections allowed per workspace SQL FE are 32767 and the maximum number of concurrent query executions depend upon the capacity units/capacity resources.
+
+### Locking & Isolation
+T-sql endpoint (DW/LH) in Microsoft Fabric defaults to Snapshot Isolation (SI), different from its predecessors include Azure Synapse Gen2 Dedicated SQL Pool. Please take care of following considerations when implementing ETL/ELT using DML statements.
+
+* ```Locks ensure concurrency correctness among transactions. T-sql endpoint can issue 3 different locks. Sch-S(Schema Stability), IX (insert/update/delete) & Sch-M(Schema Modification). Sch-S and IX are incompatable with Sch-M lock. If one of the many concurrent transactions on a table request Sch-M lock, then that trasaction will wait until Sch-S or IX locks are released on a table.```
+* ```Sch-S and IX locks are compatible. You can read and write data at the same time with SI. Dirty reads are prevented with SI.```
+* ``` Deadlocks are applied as is.```
+* ```T-SQL endpoint silently ignores SET TRANSACTION ISOLATION LEVEL command.```
+
+* T-sql endpoint uses optimistic concurrency control to detect conflicts during writes. The conflicts among transactions are detected at the time of commiting transactions. All concurrent writes (inserts/deletes/updates) can happen in parallel.
+    - Write conflict occur between update and delete statements (not insert-insert situation).
+    - The transaction that commits first will win between two or more concurrent transactions and the other transactions will fail during a write conflict.
+
+* >**```Note: The Isolation and conflict strategy applied by t-sql endpoint is different from other Microsoft SQL technologies including Azure Synapse Dedicated SQL Pool. We recommend you to modify your ETL\ELT DML logic by adding retry logic whereever applicable, typically stored procedures that are consumed by different ETL applications.```**
+
+* >**```Note: SI lets concurrent updates/deletes can consume additional consume resources and still the transaction can fail. In the future, t-sql endpoint will detect and handle write conflicts at a file level instead of transaction. Example: If two transactions are updating/deleting records in different files, then both update/delete transactions will be committed. If both transactions update/delete records from a same file, then the transaction that commits later will fail because both transactions attempted to update/delete data from a same file. With file level write conflicts, the scope of conflict is smaller compared to an entire transaction. ```**
 
 * ```TODO```
     - Resource Considerations - TODO
