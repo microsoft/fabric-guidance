@@ -1,4 +1,4 @@
-T-SQL endpoint is an endpoint that applications use to connect both Synapse Data Warehouse & Lakehouse in Microsoft Fabric. Using t-sql endpoint, applications can ingest & read data from warehouse artifact and users can only read data from lakehouse artifact.
+T-SQL endpoint is an endpoint that applications use to connect both Synapse Data Warehouse & Lakehouse in Microsoft Fabric. Using t-sql endpoint, applications can ingest & read data from warehouse artifact and applications can only read data from lakehouse artifact.
 
 ## Connectivity
 
@@ -58,13 +58,17 @@ t-sql endpoint supports two data access patterns
 
 ## Performance & Capacity Considerations to use t-sql endpoint
 
+<details>
+<summary>SQL Frontend</summary>
 * All Databases (DW/LH) hosted in a single workspace are registered to a single endpoint and capacity. Please consider following
     - Metadata operations on a single FE can be slow if number of objects are in the order of tens of thousands.
     - A single FE can cause slowness in returning large amounts of data due to network, cross region or client irrespective of capacity & compute size.
     - Cross database queries will use the capacity of the t-sql endpoint that runs the sql queries.
     - Maximum number of concurrent connections allowed per workspace SQL FE are 32767 and the maximum number of concurrent query executions depend upon the capacity units/capacity resources.
+</details>
 
-### Locking & Isolation
+<details>
+<summary>Locking & Isolation</summary>
 T-sql endpoint (DW/LH) in Microsoft Fabric defaults to Snapshot Isolation (SI), different from its predecessors include Azure Synapse Gen2 Dedicated SQL Pool. Please take care of following considerations when implementing ETL/ELT using DML statements.
 
 * ```Locks ensure concurrency correctness among transactions. T-sql endpoint can issue 3 different locks. Sch-S(Schema Stability), IX (insert/update/delete) & Sch-M(Schema Modification). Sch-S and IX are incompatable with Sch-M lock. If one of the many concurrent transactions on a table request Sch-M lock, then that trasaction will wait until Sch-S or IX locks are released on a table.```
@@ -79,10 +83,15 @@ T-sql endpoint (DW/LH) in Microsoft Fabric defaults to Snapshot Isolation (SI), 
 * >**```Note: The Isolation and conflict strategy applied by t-sql endpoint is different from other Microsoft SQL technologies including Azure Synapse Dedicated SQL Pool. We recommend you to modify your ETL\ELT DML logic by adding retry logic whereever applicable, typically stored procedures that are consumed by different ETL applications.```**
 
 * >**```Note: SI lets concurrent updates/deletes can consume additional consume resources and still the transaction can fail. In the future, t-sql endpoint will detect and handle write conflicts at a file level instead of transaction. Example: If two transactions are updating/deleting records in different files, then both update/delete transactions will be committed. If both transactions update/delete records from a same file, then the transaction that commits later will fail because both transactions attempted to update/delete data from a same file. With file level write conflicts, the scope of conflict is smaller compared to an entire transaction. ```**
+</details>
 
 * ```TODO```
     - Resource Considerations - TODO
     - Optimizations & Performance Considerations.```
+
+## Security Considerations
+
+TODO
 
 ## Development, Automation & ALM
 
